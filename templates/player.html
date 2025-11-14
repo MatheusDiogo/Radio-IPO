@@ -100,6 +100,15 @@
             border: none;
         }
 
+        .btn-fullscreen {
+            background-color: #6d28d9;
+            margin-left: 0.5rem;
+        }
+
+        .btn-fullscreen:hover {
+            background-color: #5b21b6;
+        }
+
     </style>
 </head>
 
@@ -118,8 +127,19 @@
         </audio>
 
         <div class="partitura-container">
-            <button class="btn-partitura" onclick="togglePartitura()">
+            <button 
+                id="btnTogglePartitura" 
+                class="btn-partitura" 
+                onclick="togglePartitura()">
                 📄 Ver Partitura
+            </button>
+            
+            <button 
+                id="btnFullscreen" 
+                class="btn-partitura btn-fullscreen" 
+                onclick="openFullscreen()" 
+                style="display: none;">
+                &#x26F6; Tela Cheia
             </button>
         </div>
 
@@ -134,8 +154,55 @@
 
     <script>
         function togglePartitura() {
+            // --- 1. Seleciona os elementos ---
             const viewer = document.getElementById("pdfViewer");
-            viewer.style.display = (viewer.style.display === "none") ? "block" : "none";
+            const btnToggle = document.getElementById("btnTogglePartitura");
+            const btnFull = document.getElementById("btnFullscreen");
+
+            // --- 2. Verifica o estado ATUAL do viewer ---
+            if (viewer.style.display === "none") {
+                // Se estava escondido, vamos MOSTRAR
+                
+                // Ação 1: Mostrar o PDF
+                viewer.style.display = "block";
+                
+                // Ação 2 (Requisito 2): Mudar texto do botão para "Ocultar"
+                btnToggle.innerHTML = "📄 Ocultar Partitura"; 
+                
+                // Ação 3 (Requisito 1): Mostrar o botão de Tela Cheia
+                // (Usamos "inline-block" para ficar na mesma linha)
+                btnFull.style.display = "inline-block";
+
+            } else {
+                // Se estava visível, vamos ESCONDER
+                
+                // Ação 1: Esconder o PDF
+                viewer.style.display = "none";
+                
+                // Ação 2 (Requisito 2): Voltar texto do botão ao original
+                btnToggle.innerHTML = "📄 Ver Partitura";
+                
+                // Ação 3 (Requisito 1): Esconder o botão de Tela Cheia
+                btnFull.style.display = "none";
+            }
+        }
+
+        /* --- Função de Tela Cheia (Simplificada) --- */
+        function openFullscreen() {
+            const elem = document.getElementById("pdfViewer");
+
+            // Não precisamos mais de verificar se está visível,
+            // porque este botão só pode ser clicado se já estiver visível.
+
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullScreen) { // Chrome, Safari e Opera
+                elem.webkitRequestFullScreen();
+            } else if (elem.msRequestFullScreen) { // IE/Edge
+                elem.msRequestFullScreen();
+            }
         }
     </script>
 
