@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Músicas - {{ voice_name }}</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .list-container {
+            background: #ffffff;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                        0 4px 6px -2px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #059669;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .item-link {
+            display: block;
+            padding: 1rem 1.25rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            text-decoration: none;
+            color: #374151;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .item-link:hover {
+            background-color: #f0fdf4;
+            border-color: #86efac;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            padding: 0.6rem 1rem;
+            background-color: #059669;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #047857;
+        }
+
+        .empty-list {
+            padding: 1rem;
+            text-align: center;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="list-container">
+
+        <a href="/" class="btn-back">← Voltar</a>
+
+        <h1>Músicas – {{ voice_name }}</h1>
+
+        {% for song in songs %}
+            <a href="/player?voice={{ voice_name }}&song={{ song }}" class="item-link">
+                {{ song.replace('.mp3', '') }}
+            </a>
+        {% else %}
+            <div class="empty-list">Nenhuma música encontrada.</div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>

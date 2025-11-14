@@ -1,46 +1,118 @@
 import os
-import subprocess
-from flask import Flask, Response
-
-PASTA = "TENOR"  # Pasta com as músicas
+import glob
+from flask import Flask, render_template, send_file, abort, request
 
 app = Flask(__name__)
 
-def gerar_playlist_infinita():
-    """Percorre a pasta em ordem alfabética e repete infinitamente."""
-    arquivos = sorted(
-        [os.path.join(PASTA, f) for f in os.listdir(PASTA) if f.endswith(".mp3")]
+# --- CONFIGURAÇÕES ---
+VOICES_DIR = 'Vozes'            # Diretório que contém as vozes
+FILE_PATTERN = '*.mp3'          # Tipo de arquivo de música
+MIME_TYPE = 'audio/mpeg'        # MIME para MP3
+# ----------------------
+
+# Dicionário global:
+# MUSIC_PATHS["Tenor"]["arquivo.mp3"] = caminho absoluto
+MUSIC_PATHS = {}
+
+
+def load_music_files():
+    """
+    Carrega todas as vozes (pastas dentro de /Vozes)
+    e todos os arquivos mp3 dentro de cada pasta.
+    """
+    global MUSIC_PATHS
+    MUSIC_PATHS.clear()
+
+    if not os.path.isdir(VOICES_DIR):
+        print(f"ERRO: Diretório '{VOICES_DIR}' não existe.")
+        return
+
+    voices = sorted([
+        d for d in os.listdir(VOICES_DIR)
+        if os.path.isdir(os.path.join(VOICES_DIR, d))
+    ])
+
+    print(f"Vozes encontradas ({len(voices)}): {voices}")
+
+    for voice in voices:
+        full_voice_dir = os.path.join(VOICES_DIR, voice)
+        files = sorted(glob.glob(os.path.join(full_voice_dir, FILE_PATTERN)))
+
+        MUSIC_PATHS[voice] = {}
+
+        for full_path in files:
+            filename = os.path.basename(full_path)
+            MUSIC_PATHS[voice][filename] = full_path
+
+        print(f"  - {voice}: {len(files)} arquivos")
+
+
+# ---------------------------------------
+# 1️⃣ PÁGINA PRINCIPAL → Lista de Vozes
+# ---------------------------------------
+@app.route('/')
+def index():
+    voices = sorted(MUSIC_PATHS.keys())
+    return render_template('index.html', voices=voices)
+
+
+# ----------------------------------------------------
+# 2️⃣ LISTA DE MÚSICAS DA VOZ → /voz/<voz_escolhida>
+# ----------------------------------------------------
+@app.route('/voz/<voice_name>')
+def voice_page(voice_name):
+
+    if voice_name not in MUSIC_PATHS:
+        abort(404, description="Voz não encontrada.")
+
+    songs = sorted(MUSIC_PATHS[voice_name].keys())
+
+    return render_template(
+        'songs.html',
+        voice_name=voice_name,
+        songs=songs
     )
-    
-    while True:
-        for musica in arquivos:
-            yield musica
 
-playlist = gerar_playlist_infinita()
 
-@app.route("/radio")
-def radio():
-    def gerar_stream():
-        for musica in playlist:
-            comando = [
-                "ffmpeg",
-                "-i", musica,
-                "-f", "mp3",
-                "-codec:a", "libmp3lame",
-                "-"
-            ]
+# ----------------------------------------
+# 3️⃣ PLAYER → /player?voice=X&song=Y
+# ----------------------------------------
+@app.route('/player')
+def player_page():
 
-            processo = subprocess.Popen(
-                comando,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL
-            )
+    voice = request.args.get('voice')
+    song = request.args.get('song')
 
-            for chunk in iter(lambda: processo.stdout.read(4096), b""):
-                yield chunk
+    if not voice or voice not in MUSIC_PATHS:
+        abort(404, description="Voz inválida.")
 
-    return Response(gerar_stream(), mimetype="audio/mpeg")
+    if not song or song not in MUSIC_PATHS[voice]:
+        abort(404, description="Música não encontrada.")
 
-if __name__ == "__main__":
-    print("Rádio rodando em http://localhost:2000/radio")
-    app.run(host="0.0.0.0", port=2000, threaded=True)
+    return render_template('player.html', voice=voice, song=song)
+
+
+# -----------------------------------------------------
+# ROTA QUE ENTREGA O ARQUIVO MP3 → /play/<voz>/<arquivo>
+# -----------------------------------------------------
+@app.route('/play/<voice>/<path:filename>')
+def play_song(voice, filename):
+
+    if voice not in MUSIC_PATHS:
+        abort(404, description="Voz inválida.")
+
+    full_path = MUSIC_PATHS[voice].get(filename)
+
+    if not full_path or not os.path.exists(full_path):
+        abort(404, description="Arquivo não encontrado.")
+
+    print(f"Servindo: {voice}/{filename}")
+
+    return send_file(full_path, mimetype=MIME_TYPE)
+
+
+# Inicialização
+if __name__ == '__main__':
+    load_music_files()
+    print("Servidor rodando em http://localhost:2000")
+    app.run(host='0.0.0.0', port=2000, debug=True)
