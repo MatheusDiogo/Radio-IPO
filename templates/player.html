@@ -64,6 +64,42 @@
             background-color: #047857;
         }
 
+        .partitura-container {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .btn-partitura {
+            padding: 0.6rem 1rem;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .btn-partitura:hover {
+            background-color: #1d4ed8;
+        }
+
+        .pdf-viewer {
+            margin-top: 1.5rem;
+            width: 100%;
+            height: 600px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .pdf-viewer embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
     </style>
 </head>
 
@@ -81,7 +117,26 @@
             Seu navegador não suporta áudio HTML.
         </audio>
 
+        <div class="partitura-container">
+            <button class="btn-partitura" onclick="togglePartitura()">
+                📄 Ver Partitura
+            </button>
+        </div>
+
     </div>
+
+        <div id="pdfViewer" class="pdf-viewer" style="display: none;">
+            <embed src="/Partituras/{{ song.replace('.mp3', '.pdf') }}" 
+                type="application/pdf">
+        </div>
+
+    <script>
+        function togglePartitura() {
+            const viewer = document.getElementById("pdfViewer");
+            viewer.style.display = (viewer.style.display === "none") ? "block" : "none";
+        }
+    </script>
 
 </body>
 </html>
+

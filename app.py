@@ -132,6 +132,21 @@ def play_song(voice, filename):
 
     return send_file(full_path, mimetype=MIME_TYPE)
 
+@app.route('/Partituras/<filename>')
+def show_pdf(filename):
+    if not session.get("auth"):
+        return redirect(url_for('login'))
+
+    # Nome do PDF correspondente
+    pdf_name = filename.replace(".mp3", ".pdf")
+
+    # Caminho real: Partituras/arquivo.pdf
+    full_path = os.path.join("Partituras", pdf_name)
+
+    if not os.path.exists(full_path):
+        abort(404, description="Partitura não encontrada.")
+
+    return send_file(full_path, mimetype="application/pdf")
 
 # Inicialização
 if __name__ == '__main__':
