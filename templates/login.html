@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .list-container {
+            background: #ffffff;
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                        0 4px 6px -2px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 2rem;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .input-box:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-login:hover {
+            background-color: #047857;
+        }
+
+        .error {
+            margin-top: 1rem;
+            padding: 0.7rem;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="list-container">
+
+        <h1>Login</h1>
+
+        <form method="POST">
+            <input type="password" name="senha" placeholder="Digite a senha" class="input-box">
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

@@ -1,8 +1,9 @@
 import os
 import glob
-from flask import Flask, render_template, send_file, abort, request
+from flask import Flask, render_template, send_file, abort, request, session, redirect, url_for
 
 app = Flask(__name__)
+app.secret_key = "coralipo12345"
 
 # --- CONFIGURAÇÕES ---
 VOICES_DIR = 'Vozes'            # Diretório que contém as vozes
@@ -14,6 +15,18 @@ MIME_TYPE = 'audio/mpeg'        # MIME para MP3
 # MUSIC_PATHS["Tenor"]["arquivo.mp3"] = caminho absoluto
 MUSIC_PATHS = {}
 
+PASSWORD = "coralipo"  # senha fixa
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        senha = request.form.get("senha")
+        if senha == PASSWORD:
+            session["auth"] = True
+            return redirect(url_for('index'))
+        return render_template("login.html", error="Senha incorreta!")
+
+    return render_template("login.html")
 
 def load_music_files():
     """
@@ -52,6 +65,9 @@ def load_music_files():
 # ---------------------------------------
 @app.route('/')
 def index():
+    if not session.get("auth"):
+        return redirect(url_for('login'))
+
     voices = sorted(MUSIC_PATHS.keys())
     return render_template('index.html', voices=voices)
 
@@ -61,7 +77,9 @@ def index():
 # ----------------------------------------------------
 @app.route('/voz/<voice_name>')
 def voice_page(voice_name):
-
+    if not session.get("auth"):
+        return redirect(url_for('login'))
+    
     if voice_name not in MUSIC_PATHS:
         abort(404, description="Voz não encontrada.")
 
@@ -79,7 +97,9 @@ def voice_page(voice_name):
 # ----------------------------------------
 @app.route('/player')
 def player_page():
-
+    if not session.get("auth"):
+        return redirect(url_for('login'))
+    
     voice = request.args.get('voice')
     song = request.args.get('song')
 
@@ -97,7 +117,9 @@ def player_page():
 # -----------------------------------------------------
 @app.route('/play/<voice>/<path:filename>')
 def play_song(voice, filename):
-
+    if not session.get("auth"):
+        return redirect(url_for('login'))
+    
     if voice not in MUSIC_PATHS:
         abort(404, description="Voz inválida.")
 
