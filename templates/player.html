@@ -126,8 +126,10 @@
     </div>
 
         <div id="pdfViewer" class="pdf-viewer" style="display: none;">
-            <embed src="/Partituras/{{ song.replace('.mp3', '.pdf') }}" 
-                type="application/pdf">
+            <iframe 
+                src="/static/pdfjs/web/viewer.html?file=/Partituras/{{ song.replace('.mp3', '.pdf') }}"
+                class="pdf-viewer">
+            </iframe>
         </div>
 
     <script>
