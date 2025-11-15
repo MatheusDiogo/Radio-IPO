@@ -108,7 +108,25 @@
         .btn-fullscreen:hover {
             background-color: #5b21b6;
         }
+        
+        :fullscreen .pdf-viewer,
+        :-webkit-full-screen .pdf-viewer,
+        :-moz-full-screen .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
 
+        /* Garantir que o iframe também expanda */
+        :fullscreen .pdf-viewer iframe,
+        :-webkit-full-screen .pdf-viewer iframe,
+        :-moz-full-screen .pdf-viewer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 
@@ -189,7 +207,7 @@
 
         /* --- Função de Tela Cheia (Simplificada) --- */
         function openFullscreen() {
-            const elem = document.getElementById("pdfViewer");
+            const elem = document.querySelector("#pdfViewer iframe");
 
             // Não precisamos mais de verificar se está visível,
             // porque este botão só pode ser clicado se já estiver visível.
